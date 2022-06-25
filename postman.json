@@ -1,0 +1,228 @@
+{
+	"info": {
+		"_postman_id": "f8907ceb-6964-48b1-8c94-30eced063854",
+		"name": "Permissions",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Init Org",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "org_name",
+							"value": "test-org",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:4000/init",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"init"
+					]
+				},
+				"description": "Initializes an organization (one time action)"
+			},
+			"response": []
+		},
+		{
+			"name": "Add New Node Write",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"org_name\": \"test-org\",\n    \"name\": \"CanWrite\",\n    \"additions\": [],\n    \"subtractions\": []\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:4000/add",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"add"
+					]
+				},
+				"description": "Adds a new node with no permissions."
+			},
+			"response": []
+		},
+		{
+			"name": "Add New Node Read",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"org_name\": \"test-org\",\n    \"name\": \"CanWrite\",\n    \"additions\": [],\n    \"subtractions\": []\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:4000/add",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"add"
+					]
+				},
+				"description": "Adds a new node with no permissions."
+			},
+			"response": []
+		},
+		{
+			"name": "Add New Node Manage",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"org_name\": \"test-org\",\n    \"name\": \"CanManage\",\n    \"additions\": [],\n    \"subtractions\": []\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:4000/add",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"add"
+					]
+				},
+				"description": "Adds a new node with no permissions."
+			},
+			"response": []
+		},
+		{
+			"name": "Add Connection Read -> Manage",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"org_name\": \"test-org\",\n    \"from\": \"CanRead\",\n    \"to\": \"CanManage\",\n    \"is_addition\": true,\n    \"is_create\": true\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:4000/edit",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"edit"
+					]
+				},
+				"description": "Adds a connection between read and manage"
+			},
+			"response": []
+		},
+		{
+			"name": "Add Connection Write -> Manage",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"org_name\": \"test-org\",\n    \"from\": \"CanWrite\",\n    \"to\": \"CanManage\",\n    \"is_addition\": true,\n    \"is_create\": true\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:4000/edit",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"edit"
+					]
+				},
+				"description": "Adds a connection between read and manage"
+			},
+			"response": []
+		},
+		{
+			"name": "View",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": ""
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Contains",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:4000/contains?org_name=test-org&role=CanManage&perm=CanWrite",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"contains"
+					],
+					"query": [
+						{
+							"key": "org_name",
+							"value": "test-org"
+						},
+						{
+							"key": "role",
+							"value": "CanManage"
+						},
+						{
+							"key": "perm",
+							"value": "CanWrite"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
