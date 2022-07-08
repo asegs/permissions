@@ -111,9 +111,11 @@ defmodule Permissions do
     handle_cache(t, name, cached)
   end
 
-
-  defp perm_to_string(p = %Permission{}) do
-    Poison.encode!(p)
+  #Should delete recursively through parents and children.
+  def delete_node(t = %Tree{permissions: permissions, cache: cache}, name) do
+    invalidate_caches(t, name)
+    :ets.delete(permissions, name)
+    :ets.delete(cache, name)
   end
 
 

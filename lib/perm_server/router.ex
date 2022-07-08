@@ -28,6 +28,17 @@ defmodule PermServer.Router do
     |> send_resp(200, Poison.encode!(%{message: "Created new node in " <> org_name <> " named " <> name}))
   end
 
+  post "/delete" do
+    org_name = Map.get(conn.body_params, "org_name")
+    name = Map.get(conn.body_params, "name")
+    t = Permissions.load_tree(org_name)
+    Permissions.delete_node(t, name)
+    Permissions.dump_tree(t)
+    conn
+    |> put_resp_content_type("application/json")
+    |> send_resp(200, Poison.encode!(%{message: "Delete node in " <> org_name <> " named " <> name}))
+  end
+
   post "/edit" do
     org_name = Map.get(conn.body_params, "org_name")
     from = Map.get(conn.body_params, "from")
@@ -76,5 +87,12 @@ defmodule PermServer.Router do
     |> send_resp(200, Poison.encode!(%{contains: contains}))
   end
 
-
+  get "/load" do
+    org_name = Map.get(conn.query_params, "org_name")
+    t = Permissions.load_tree(org_name)
+    perm_list = Enum.map(:ets.tab2list(t.permissions), fn {_,v} -> v end)
+    conn
+    |> put_resp_content_type("application/json")
+    |> send_resp(200, Poison.encode!%{permissions: perm_list})
+  end
 end

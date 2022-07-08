@@ -1,6 +1,7 @@
 defmodule PermServer.Endpoint do
   use Plug.Router
   use Plug.Debugger
+  plug Corsica, origins: "http://localhost:3000", allow_headers: :all
   
   plug(:match)
 
@@ -12,10 +13,6 @@ defmodule PermServer.Endpoint do
 
   plug(:dispatch)
   forward("/",to: PermServer.Router)
-
-  match _ do
-    send_resp(conn, 404, "Requested page not found!")
-  end
 
   def child_spec(opts) do
     %{
