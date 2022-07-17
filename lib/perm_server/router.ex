@@ -46,7 +46,7 @@ defmodule PermServer.Router do
     is_addition = Map.get(conn.body_params, "is_addition")
     is_create = Map.get(conn.body_params, "is_create")
     t = Permissions.load_tree(org_name)
-    Permissions.edit_connections(t, from, to, is_addition, is_create)
+    success = Permissions.edit_connections(t, from, to, is_addition, is_create)
     Permissions.dump_tree(t)
     type = if is_addition do
       "addition"
@@ -59,9 +59,15 @@ defmodule PermServer.Router do
     else
       "Removed"
     end
-    conn
-    |> put_resp_content_type("application/json")
-    |> send_resp(200, Poison.encode!(%{message: action <> " " <> type <>" from " <> from <> " to " <> to <> " in " <> org_name}))
+    if success do
+      conn
+      |> put_resp_content_type("application/json")
+      |> send_resp(200, Poison.encode!(%{message: action <> " " <> type <>" from " <> from <> " to " <> to <> " in " <> org_name}))
+    else
+      conn
+      |> put_resp_content_type("application/json")
+      |> send_resp(200, Poison.encode!(%{message: "Failed to connect " <> type <>" from " <> from <> " to " <> to <> " in " <> org_name <> " due to a cycle."}))
+    end
   end
 
   get "/view" do

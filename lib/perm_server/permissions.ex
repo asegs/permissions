@@ -51,16 +51,20 @@ defmodule Permissions do
   end
 
   def edit_connections(t = %Tree{}, from, to, is_addition, is_create) do
-    from_perm = lookup_val(t, from)
-    to_perm = lookup_val(t, to)
-    save_perm(t, %{from_perm | parents: modify_map(from_perm.parents, to, is_create)})
-    updated_parent = if is_addition do
-      %{to_perm | additions: modify_map(to_perm.additions, from, is_create)}
-    else
-      %{to_perm | subtractions: modify_map(to_perm.subtractions, from, is_create)}
+    conn = connection_exists(t,from,to)
+    IO.inspect(conn)
+    if !conn do
+      from_perm = lookup_val(t, from)
+      to_perm = lookup_val(t, to)
+      save_perm(t, %{from_perm | parents: modify_map(from_perm.parents, to, is_create)})
+      updated_parent = if is_addition do
+        %{to_perm | additions: modify_map(to_perm.additions, from, is_create)}
+      else
+        %{to_perm | subtractions: modify_map(to_perm.subtractions, from, is_create)}
+      end
+      save_perm(t, updated_parent)
+      invalidate_caches(t, to)
     end
-    save_perm(t, updated_parent)
-    invalidate_caches(t, to)
   end
 
   def contains(t = %Tree{}, key, perm) do
@@ -147,6 +151,29 @@ defmodule Permissions do
     for perm <- f_perm_list, do: :ets.insert(permissions, {perm.name, perm})
     for [key, list] <- cache_list, do: :ets.insert(cache, {key, MapSet.new(list)})
     %Tree{name: name, permissions: permissions, cache: cache}
+  end
+
+  def dfs_recurse(graph,vertex_name,target,path) do
+    if Enum.member?(path,vertex_name) do
+      false
+    else
+      dfs(graph,vertex_name,target,path)
+    end
+  end
+
+  def dfs(t = %Tree{},from, to, path) do
+    if from == to do
+      true
+    else
+      included_path = [from | path]
+      vertex = lookup_val(t, from)
+      children = MapSet.union(vertex.additions, vertex.subtractions)
+      Enum.any?(children, fn child -> dfs_recurse(t,child,to,included_path) end)
+    end
+  end
+
+  def connection_exists(t=%Tree{},from,to) do
+    dfs(t,from,to,[])
   end
 
 end
