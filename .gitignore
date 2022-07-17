@@ -28,3 +28,5 @@ perm_server-*.tar
 .idea/
 
 lib/records
+
+erlang-solutions_2.0_all.deb
