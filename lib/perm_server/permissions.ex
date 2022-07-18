@@ -51,9 +51,7 @@ defmodule Permissions do
   end
 
   def edit_connections(t = %Tree{}, from, to, is_addition, is_create) do
-    conn = connection_exists(t,from,to)
-    IO.inspect(conn)
-    if !conn do
+    if connection_exists(t,from,to) do
       from_perm = lookup_val(t, from)
       to_perm = lookup_val(t, to)
       save_perm(t, %{from_perm | parents: modify_map(from_perm.parents, to, is_create)})

@@ -6,9 +6,8 @@ defmodule PermServer.Router do
   plug(:dispatch)
 
   post "/init" do
-    IO.inspect conn.query_params
-    IO.inspect conn.body_params
-    t = Permissions.create_tree(Map.get(conn.body_params,"org_name"))
+    %{"org_name"=>org_name} = conn.body_params
+    t = Permissions.create_tree(org_name)
     Permissions.dump_tree(t)
     conn
     |> put_resp_content_type("application/json")
@@ -16,10 +15,7 @@ defmodule PermServer.Router do
   end
 
   post "/add" do
-    org_name = Map.get(conn.body_params, "org_name")
-    name = Map.get(conn.body_params, "name")
-    additions = Map.get(conn.body_params, "additions")
-    subtractions = Map.get(conn.body_params, "subtractions")
+    %{"org_name"=>org_name,"name"=>name,"additions"=>additions,"subtractions"=>subtractions} = conn.body_params
     t = Permissions.load_tree(org_name)
     Permissions.add_new_node(t, name, additions, subtractions)
     Permissions.dump_tree(t)
@@ -29,8 +25,7 @@ defmodule PermServer.Router do
   end
 
   post "/delete" do
-    org_name = Map.get(conn.body_params, "org_name")
-    name = Map.get(conn.body_params, "name")
+    %{"org_name"=>org_name,"name"=>name} = conn.body_params
     t = Permissions.load_tree(org_name)
     Permissions.delete_node(t, name)
     Permissions.dump_tree(t)
@@ -40,11 +35,7 @@ defmodule PermServer.Router do
   end
 
   post "/edit" do
-    org_name = Map.get(conn.body_params, "org_name")
-    from = Map.get(conn.body_params, "from")
-    to = Map.get(conn.body_params, "to")
-    is_addition = Map.get(conn.body_params, "is_addition")
-    is_create = Map.get(conn.body_params, "is_create")
+    %{"org_name"=>org_name,"from"=>from,"to"=>to,"is_addition"=>is_addition,"is_create"=>is_create} = conn.body_params
     t = Permissions.load_tree(org_name)
     success = Permissions.edit_connections(t, from, to, is_addition, is_create)
     Permissions.dump_tree(t)
@@ -71,8 +62,7 @@ defmodule PermServer.Router do
   end
 
   get "/view" do
-    org_name = Map.get(conn.query_params, "org_name")
-    name = Map.get(conn.query_params, "name")
+    %{"org_name"=>org_name,"name"=>name} = conn.body_params
     t = Permissions.load_tree(org_name)
     results = Permissions.get_leaves(t, name)
     Permissions.dump_tree(t)
@@ -82,9 +72,7 @@ defmodule PermServer.Router do
   end
 
   get "/contains" do
-    org_name = Map.get(conn.query_params, "org_name")
-    perm = Map.get(conn.query_params, "perm")
-    role = Map.get(conn.query_params, "role")
+    %{"org_name"=>org_name,"perm"=>perm,"role"=>role} = conn.body_params
     t = Permissions.load_tree(org_name)
     contains = Permissions.contains(t, role, perm)
     Permissions.dump_tree(t)
@@ -94,7 +82,7 @@ defmodule PermServer.Router do
   end
 
   get "/load" do
-    org_name = Map.get(conn.query_params, "org_name")
+    %{"org_name"=>org_name} = conn.body_params
     t = Permissions.load_tree(org_name)
     perm_list = Enum.map(:ets.tab2list(t.permissions), fn {_,v} -> v end)
     conn
