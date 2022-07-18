@@ -15,7 +15,9 @@ defmodule PermServer.Router do
   end
 
   post "/add" do
-    %{"org_name" => org_name, "name" => name,"additions" => additions,"subtractions" => subtractions} = conn.body_params
+    defaults = %{"additions": [], "subtractions": []}
+    combined_params = Map.merge(defaults, conn.body_params)
+    %{"org_name" => org_name, "name" => name,"additions" => additions,"subtractions" => subtractions} = combined_params
     t = Permissions.load_tree(org_name)
     Permissions.add_new_node(t, name, additions, subtractions)
     Permissions.dump_tree(t)
