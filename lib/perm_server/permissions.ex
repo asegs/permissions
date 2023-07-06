@@ -67,21 +67,6 @@ defmodule Permissions do
     end
   end
 
-  def edit_connections_old(t = %Tree{}, from, to, is_addition, is_create) do
-    if connection_exists(t,from,to) do
-      from_perm = lookup_val(t, from)
-      to_perm = lookup_val(t, to)
-      save_perm(t, %{from_perm | parents: modify_map(from_perm.parents, to, is_create)})
-      updated_parent = if is_addition do
-        %{to_perm | additions: modify_map(to_perm.additions, from, is_create)}
-      else
-        %{to_perm | subtractions: modify_map(to_perm.subtractions, from, is_create)}
-      end
-      save_perm(t, updated_parent)
-      invalidate_caches(t, to)
-    end
-  end
-
   def contains(t = %Tree{}, key, perm) do
     MapSet.member?(get_leaves(t, key), perm)
   end
