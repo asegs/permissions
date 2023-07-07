@@ -85,8 +85,18 @@ defmodule PermServer.Router do
 
   get "/load" do
     %{"org_name" => org_name} = conn.query_params
-    t = Permissions.load_tree(org_name)
-    perm_list = Enum.map(:ets.tab2list(t.permissions), fn {_,v} -> v end)
+    t = try do
+      Permissions.load_tree(org_name)
+    rescue
+      MatchError -> %Permissions.Tree{name: org_name}
+    end
+
+    perm_list = try do
+      Enum.map(:ets.tab2list(t.permissions), fn {_,v} -> v end)
+    rescue
+      ArgumentError -> []
+    end
+    
     conn
     |> put_resp_content_type("application/json")
     |> send_resp(200, Poison.encode!%{permissions: perm_list})
